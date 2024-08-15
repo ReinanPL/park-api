@@ -14,7 +14,7 @@ import lombok.Setter;
 @Table(name = "users")
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -26,7 +26,7 @@ public class User implements Serializable {
 
     @Column(name = "role", nullable = false, length = 25)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.ROLE_CLIENT;
 
     @Column(name = "created_at")
     private LocalDateTime createDate;
