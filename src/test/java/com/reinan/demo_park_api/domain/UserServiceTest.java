@@ -5,13 +5,14 @@ import com.reinan.demo_park_api.exception.EntityNotFoundException;
 import com.reinan.demo_park_api.exception.PasswordInvalidException;
 import com.reinan.demo_park_api.exception.UsernameUniqueViolationException;
 import com.reinan.demo_park_api.repository.UserRepository;
-import com.reinan.demo_park_api.service.UserService;
+import com.reinan.demo_park_api.service.impl.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 import java.util.Collections;
@@ -20,9 +21,8 @@ import java.util.Optional;
 
 import static com.reinan.demo_park_api.common.UserConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -32,12 +32,21 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
-    private UserService userService;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
+    @InjectMocks
+    private UserServiceImpl userService;
+
+    @BeforeEach
+    void setUp() {
+        passwordEncoder = new BCryptPasswordEncoder();
+        userService = new UserServiceImpl(userRepository, passwordEncoder);
+    }
 
     @Test
     public void saveUserWithValidData_ReturnsUser() {
+        USER.setPassword(passwordEncoder.encode(USER.getPassword()));
         when(userRepository.save(USER)).thenReturn(USER);
 
         User savedUser = userService.save(USER);
@@ -75,12 +84,15 @@ public class UserServiceTest {
 
     @Test
     public void setPassword_WithValidData() {
+        USER.setPassword(passwordEncoder.encode(USER_PASSWORD.getOldPassword()));
         when(userRepository.findById(1L)).thenReturn(Optional.of(USER));
 
         userService.setPassword(1L, USER_PASSWORD.getOldPassword(), USER_PASSWORD.getNewPassword(), USER_PASSWORD.getConfirmPassword());
 
-        assertEquals(USER_PASSWORD.getNewPassword(), USER.getPassword());
-        verify(userRepository, times(1)).findById(1L);
+        var user = userRepository.findById(1L);
+
+        assertTrue(passwordEncoder.matches(USER_PASSWORD.getNewPassword(), user.get().getPassword()));
+        verify(userRepository, times(2)).findById(1L);
     }
 
     @Test
@@ -98,7 +110,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void listUser_ReturnAllPlanets() {
+    public void listUser_ReturnAllUsers() {
         when(userRepository.findAll()).thenReturn(USERS);
 
         List<User> result = userService.getAllUsers();
