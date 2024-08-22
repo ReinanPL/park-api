@@ -1,5 +1,6 @@
 package com.reinan.demo_park_api.web.exception;
 
+import com.reinan.demo_park_api.exception.CpfUniqueViolationException;
 import com.reinan.demo_park_api.exception.EntityNotFoundException;
 import com.reinan.demo_park_api.exception.PasswordInvalidException;
 import com.reinan.demo_park_api.exception.UsernameUniqueViolationException;
@@ -32,7 +33,7 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Invalid field", result));
     }
 
-    @ExceptionHandler(UsernameUniqueViolationException.class)
+    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex, HttpServletRequest request) {
         log.error("Api Error - ", ex);
         return ResponseEntity

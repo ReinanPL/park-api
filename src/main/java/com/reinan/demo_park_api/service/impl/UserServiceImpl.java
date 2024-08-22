@@ -23,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+
+    @Override
     @Transactional
     public User save(User user) {
         try {
@@ -34,12 +36,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     @Transactional(readOnly = true)
     public User getUser(Long id){
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User id: '%s' not found", id)));
     }
 
+    @Override
     @Transactional
     public void setPassword(Long id, String oldPassword, String newPassword, String confirmPassword){
         Optional.of(newPassword)
@@ -55,6 +59,7 @@ public class UserServiceImpl implements UserService {
         save(user);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<User> getAllUsers(){
         return userRepository.findAll();
