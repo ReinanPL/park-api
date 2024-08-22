@@ -131,7 +131,7 @@ public class UserIT {
 	}
 
 	@Test
-	public void findUserById_WithExistId_ReturnUserCreatedWithStatus200(){
+	public void findUserById_WithExistId_ReturnUserWithStatus200(){
 		UserResponseDto responseBody = testClient
 				.get()
 				.uri("/api/v1/users/101")

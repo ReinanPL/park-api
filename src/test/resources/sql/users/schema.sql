@@ -4,3 +4,10 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL
 );
+CREATE TABLE clients (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
